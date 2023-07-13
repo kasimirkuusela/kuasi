@@ -46,6 +46,13 @@
         progressElement.textContent = `${checkedCount} / ${totalCheckboxes}`;
       }
   
+      // Update the total progress element
+      const totalProgressElement = document.querySelector('[k-el="total_progress"]');
+      if (totalProgressElement) {
+        const totalCheckboxes = document.querySelectorAll('input[type="checkbox"]').length;
+        totalProgressElement.textContent = `${checkedCount} / ${totalCheckboxes}`;
+      }
+  
       // Save the checkbox states to the cookie
       const checkboxStates = Array.from(checkboxes).map(function(checkbox) {
         return checkbox.checked;
@@ -149,12 +156,17 @@
         });
   
         sets.forEach(function(setName) {
-          setCookie(`${setName}_progress`, '', -1);
           const onpageProgress = document.querySelector(`[k-el="${setName}_progress"]`);
           if (onpageProgress) {
             onpageProgress.textContent = '0 / 0';
           }
+          setCookie(`${setName}_progress`, '', 365);
         });
+  
+        const totalProgressElement = document.querySelector('[k-el="total_progress"]');
+        if (totalProgressElement) {
+          totalProgressElement.textContent = '0 / 0';
+        }
   
         updateOverallProgress();
       });
