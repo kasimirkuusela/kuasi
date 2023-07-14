@@ -1,9 +1,3 @@
-// TO DO
-// # Save progress to cookie
-// # Add .checked class to parent of checked inputs
-// # Update progress indicators on page
-// # Show provided website URL on page
-
 (function() {
     // Function to set a cookie
     function setCookie(name, value, days) {
@@ -46,13 +40,6 @@
         progressElement.textContent = `${checkedCount} / ${totalCheckboxes}`;
       }
   
-      // Update the total progress element
-      const totalProgressElement = document.querySelector('[k-el="total_progress"]');
-      if (totalProgressElement) {
-        const totalCheckboxes = document.querySelectorAll('input[type="checkbox"]').length;
-        totalProgressElement.textContent = `${checkedCount} / ${totalCheckboxes}`;
-      }
-  
       // Save the checkbox states to the cookie
       const checkboxStates = Array.from(checkboxes).map(function(checkbox) {
         return checkbox.checked;
@@ -86,6 +73,16 @@
       const fillElement = document.querySelector('[k-el="progress_fill"]');
       if (fillElement) {
         fillElement.style.width = `${progressPercentage}%`;
+      }
+  
+      // Update the total progress element
+      const totalProgressElement = document.querySelector('[k-el="total_progress"]');
+      if (totalProgressElement) {
+        const totalProgressValue = `${checkedCount} / ${totalCheckboxes}`;
+        totalProgressElement.textContent = totalProgressValue;
+  
+        // Save the total progress to the cookie
+        setCookie('total_progress', totalProgressValue, 365);
       }
     }
   
@@ -142,6 +139,15 @@
       updateProgress(setName);
     });
   
+    // Retrieve the total progress from the cookie
+    const totalProgressCookie = getCookie('total_progress');
+    if (totalProgressCookie) {
+      const totalProgressElement = document.querySelector('[k-el="total_progress"]');
+      if (totalProgressElement) {
+        totalProgressElement.textContent = totalProgressCookie;
+      }
+    }
+  
     // Perform initial update for the overall progress bar
     updateOverallProgress();
   
@@ -158,14 +164,16 @@
         sets.forEach(function(setName) {
           const onpageProgress = document.querySelector(`[k-el="${setName}_progress"]`);
           if (onpageProgress) {
-            onpageProgress.textContent = '0 / 0';
+            const totalCheckboxes = document.querySelectorAll(`input[k-el^="${setName}"]`).length;
+            onpageProgress.textContent = `0 / ${totalCheckboxes}`;
+            setCookie(`${setName}_progress`, '', 365);
           }
-          setCookie(`${setName}_progress`, '', 365);
         });
   
         const totalProgressElement = document.querySelector('[k-el="total_progress"]');
         if (totalProgressElement) {
-          totalProgressElement.textContent = '0 / 0';
+          totalProgressElement.textContent = '0 / 56';
+          setCookie('total_progress', '0 / 56', 365);
         }
   
         updateOverallProgress();
