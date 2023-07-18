@@ -112,14 +112,10 @@ function completed(setName) {
       path: animationPath
     });
   
-    // Show container
-    container.style.display = 'block';
-  
     // Play animation and reset after 4 seconds
     setTimeout(function() {
       animation.goToAndStop(0);
       animation.destroy();
-      container.style.display = 'none';
     }, 4000);
 
 }
@@ -189,9 +185,6 @@ sets.forEach(function(setName) {
   
     updateProgress(setName);
   });
-  // ...
-  
-  
   
     // Retrieve the total progress from the cookie
     const totalProgressCookie = getCookie('total_progress');
@@ -218,41 +211,39 @@ sets.forEach(function(setName) {
     // Perform initial update for the overall progress bar
     updateOverallProgress();
   
-    // Event listener for the reset element
-    const resetElement = document.querySelector('[k-el="reset"]');
-    if (resetElement) {
-      resetElement.addEventListener('click', function() {
-        checkboxes.forEach(function(checkbox) {
-          checkbox.checked = false;
-          const parentDiv = checkbox.parentNode;
-          parentDiv.classList.remove('checked');
+   // Event listener for the reset element
+const resetElement = document.querySelector('[k-el="reset"]');
+if (resetElement) {
+  resetElement.addEventListener('click', function() {
+    checkboxes.forEach(function(checkbox) {
+      checkbox.checked = false;
+      const parentDiv = checkbox.parentNode;
+      parentDiv.classList.remove('checked');
+      const customCheckbox = parentDiv.querySelector('.w-checkbox-input');
+      if (customCheckbox) {
+        customCheckbox.classList.remove('w--redirected-checked');
+      }
+    });
+
+    sets.forEach(function(setName) {
+      const onpageProgress = document.querySelectorAll(`[k-el="${setName}_progress"]`);
+      if (onpageProgress) {
+        const totalCheckboxes = document.querySelectorAll(`input[k-el^="${setName}"]`).length;
+        onpageProgress.forEach(function(progressElement) {
+          progressElement.textContent = `0 / ${totalCheckboxes}`;
         });
-  
-        sets.forEach(function(setName) {
-          const onpageProgress = document.querySelectorAll(`[k-el="${setName}_progress"]`);
-          if (onpageProgress) {
-            const totalCheckboxes = document.querySelectorAll(`input[k-el^="${setName}"]`).length;
-            onpageProgress.forEach(function(progressElement) {
-              progressElement.textContent = `0 / ${totalCheckboxes}`;
-            });
-            setCookie(`${setName}_progress`, '', 365);
-          }
-        });
-  
-        const totalProgressElement = document.querySelector('[k-el="total_progress"]');
-        if (totalProgressElement) {
-          const totalCheckboxes = checkboxes.length;
-          totalProgressElement.textContent = `0 / ${totalCheckboxes}`;
-          setCookie('total_progress', `0 / ${totalCheckboxes}`, 365);
-        }
-  
-        // Hide the success animation container
-        const container = document.querySelector('[k-el="successAnimation"]');
-        if (container) {
-          container.style.display = 'none';
-        }
-  
-        updateOverallProgress();
-      });
+        setCookie(`${setName}_progress`, '', 365);
+      }
+    });
+
+    const totalProgressElement = document.querySelector('[k-el="total_progress"]');
+    if (totalProgressElement) {
+      const totalCheckboxes = checkboxes.length;
+      totalProgressElement.textContent = `0 / ${totalCheckboxes}`;
+      setCookie('total_progress', `0 / ${totalCheckboxes}`, 365);
     }
+
+    updateOverallProgress();
+  });
+}
   })();
