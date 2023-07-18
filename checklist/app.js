@@ -48,6 +48,12 @@
       });
       setCookie(`${setName}_progress`, checkboxStates.join(','), 365);
   
+      // Check if all checkboxes are checked
+      if (checkedCount === totalCheckboxes) {
+        // Invoke the 'completed' function
+        completed(setName);
+      }
+  
       // Update the overall progress bar
       updateOverallProgress();
     }
@@ -88,6 +94,36 @@
       }
     }
   
+ // Function to handle completion of a set
+function completed(setName) {
+    // Perform actions when all checkboxes in the set are checked
+    console.log(`Set '${setName}' completed.`);
+  
+    // Elements
+    const container = document.querySelector('[k-el="successAnimation"]');
+    const animationPath = 'https://lottie.host/c8ff4344-7b99-4c7c-a694-53f2da38fe84/u7yeblMKbs.json';
+  
+    // Play Lottie animation
+    const animation = lottie.loadAnimation({
+      container: container,
+      renderer: 'svg',
+      loop: true,
+      autoplay: true,
+      path: animationPath
+    });
+  
+    // Show container
+    container.style.display = 'block';
+  
+    // Play animation and reset after 4 seconds
+    setTimeout(function() {
+      animation.goToAndStop(0);
+      animation.destroy();
+      container.style.display = 'none';
+    }, 4000);
+
+}
+
     // Perform initial setup and update for each set's progress
     const sets = new Set();
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
@@ -116,30 +152,46 @@
       });
     });
   
-    sets.forEach(function(setName) {
-      const checkboxes = document.querySelectorAll(`input[k-el^="${setName}"]`);
-      const checkboxStates = getCookie(`${setName}_progress`);
+   // ...
+sets.forEach(function(setName) {
+    const checkboxes = document.querySelectorAll(`input[k-el^="${setName}"]`);
+    const checkboxStates = getCookie(`${setName}_progress`);
   
-      if (checkboxStates) {
-        const states = checkboxStates.split(',');
-        checkboxes.forEach(function(checkbox, index) {
-          checkbox.checked = states[index] === 'true';
-          const parentDiv = checkbox.parentNode;
-          if (checkbox.checked) {
-            parentDiv.classList.add('checked');
-          } else {
-            parentDiv.classList.remove('checked');
+    if (checkboxStates) {
+      const states = checkboxStates.split(',');
+      checkboxes.forEach(function(checkbox, index) {
+        checkbox.checked = states[index] === 'true';
+        const parentDiv = checkbox.parentNode;
+        const customCheckbox = parentDiv.querySelector('.w-checkbox-input');
+  
+        if (checkbox.checked) {
+          parentDiv.classList.add('checked');
+          if (customCheckbox) {
+            customCheckbox.classList.add('w--redirected-checked');
           }
-        });
-      } else {
-        checkboxes.forEach(function(checkbox) {
-          checkbox.checked = false;
-          checkbox.parentNode.classList.remove('checked');
-        });
-      }
+        } else {
+          parentDiv.classList.remove('checked');
+          if (customCheckbox) {
+            customCheckbox.classList.remove('w--redirected-checked');
+          }
+        }
+      });
+    } else {
+      checkboxes.forEach(function(checkbox) {
+        checkbox.checked = false;
+        checkbox.parentNode.classList.remove('checked');
+        const customCheckbox = checkbox.parentNode.querySelector('.w-checkbox-input');
+        if (customCheckbox) {
+          customCheckbox.classList.remove('w--redirected-checked');
+        }
+      });
+    }
   
-      updateProgress(setName);
-    });
+    updateProgress(setName);
+  });
+  // ...
+  
+  
   
     // Retrieve the total progress from the cookie
     const totalProgressCookie = getCookie('total_progress');
@@ -149,6 +201,19 @@
         totalProgressElement.textContent = totalProgressCookie;
       }
     }
+  
+    // Restore the visibility of the container if the set is completed
+    sets.forEach(function(setName) {
+      const checkboxStates = getCookie(`${setName}_progress`);
+      if (checkboxStates) {
+        const states = checkboxStates.split(',');
+        const totalCheckboxes = states.length;
+        const checkedCount = states.filter(state => state === 'true').length;
+        if (checkedCount === totalCheckboxes) {
+          completed(setName);
+        }
+      }
+    });
   
     // Perform initial update for the overall progress bar
     updateOverallProgress();
@@ -181,8 +246,13 @@
           setCookie('total_progress', `0 / ${totalCheckboxes}`, 365);
         }
   
+        // Hide the success animation container
+        const container = document.querySelector('[k-el="successAnimation"]');
+        if (container) {
+          container.style.display = 'none';
+        }
+  
         updateOverallProgress();
       });
     }
   })();
-  
