@@ -37,7 +37,7 @@ const maintenanceWhenNeededRadio = document.querySelector('input[name="Maintenan
 // Scope: Development
 scopeDevelopmentRadio.checked = true;
 // Maintenance: When Needed
-maintenanceWhenNeededRadio.checked = true;
+// maintenanceWhenNeededRadio.checked = true;
 
 // Add event listeners to radio buttons in the "Scope" group
 scopeRadioButtons.forEach((radioButton) => {
