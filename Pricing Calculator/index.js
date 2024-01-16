@@ -63,18 +63,14 @@ maintenanceRadioButtons.forEach((radioButton) => {
   radioButton.addEventListener('change', () => {
     // Check if the radio button is checked
     if (radioButton.checked) {
-      // Remove the "selected" class from all radio buttons in the "Maintenance" group
-      maintenanceRadioButtons.forEach((button) => {
-        button.closest('.calc-button.cc-option').classList.remove('selected');
-      });
-      
-      // Add the "selected" class to the parent element of the checked radio button
-      const parentElement = radioButton.closest('.calc-button.cc-option');
-      if (parentElement) {
-        parentElement.classList.add('selected');
-      }
+      // Call the function to toggle the "cc-disabled" class for ongoing elements
+      toggleOngoingFeaturesDisabledStatus();
+      showSpansByPageCount(pageCount); // Update the spans based on page count
+      updateMaintenancePricing();
     }
   });
+});
+
 
 // Function to update the pricing range based on page count and the selected radio button
 function updatePriceRange() {
@@ -246,5 +242,5 @@ showSpansByPageCount(pageCount);
 
 //Update extra pages text
 updateExtraPagesText(pageCount);
-});
+
 
